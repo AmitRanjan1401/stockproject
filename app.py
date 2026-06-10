@@ -6,14 +6,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 from sklearn.preprocessing import MinMaxScaler
-import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense, Bidirectional
 import base64
 from io import BytesIO
-
-# Suppress warnings
-tf.get_logger().setLevel('ERROR')
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -523,19 +517,17 @@ if len(X) > 0:
     X_train, X_test = X[:train_size], X[train_size:]
     y_train, y_test = y[:train_size], y[train_size:]
     
+    from sklearn.linear_model import Ridge
     with st.spinner(f"🤖 Training AI Model for {stock_name}..."):
-        model = Sequential([
-            Bidirectional(LSTM(60, return_sequences=True), input_shape=(seq_len, 1)),
-            Bidirectional(LSTM(60)),
-            Dense(1)
-        ])
-        model.compile(optimizer="adam", loss="mse")
-        model.fit(X_train, y_train, epochs=epochs, batch_size=32, verbose=0)
+        X_train_2d = X_train.reshape(X_train.shape[0], -1)
+        X_test_2d = X_test.reshape(X_test.shape[0], -1)
+        model = Ridge(alpha=1.0)
+        model.fit(X_train_2d, y_train.ravel())
     
     last_seq = scaled_close[-seq_len:].copy()
     future_scaled = []
     for _ in range(forecast_days):
-        pred = model.predict(last_seq.reshape(1, seq_len, 1), verbose=0)[0][0]
+        pred = model.predict(last_seq.reshape(1, -1))[0]
         future_scaled.append(pred)
         last_seq = np.append(last_seq[1:], [[pred]], axis=0)
     
