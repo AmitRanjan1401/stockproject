@@ -1,7 +1,7 @@
-streamlit
-yfinance
-pandas
-numpy
-plotly
-scikit-learn
-tensorflow
+streamlit==1.55.0
+yfinance==1.2.0
+pandas==2.3.3
+numpy==2.2.6
+plotly==6.6.0
+scikit-learn==1.8.0
+tensorflow-cpu==2.21.0
