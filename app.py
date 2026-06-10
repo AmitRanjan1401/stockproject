@@ -262,7 +262,9 @@ with st.sidebar:
 @st.cache_data(ttl=60)
 def load_data(ticker):
     with st.spinner(f"📥 Fetching {ticker_options[ticker]['name']} data..."):
-        data = yf.download(ticker, start="2015-01-01", progress=False)
+        data = yf.download(ticker, start="2015-01-01", progress=False, auto_adjust=True)
+        if isinstance(data.columns, pd.MultiIndex):
+            data.columns = data.columns.get_level_values(0)
         return data.dropna()
 
 data = load_data(selected_stock)
